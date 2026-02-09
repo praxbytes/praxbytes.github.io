@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jiya Support System™</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #ffe0f0, #fff7fb);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 340px;
+    }
+
+    .cat {
+      font-size: 90px;
+      margin: 30px auto;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .cat:active {
+      transform: scale(0.9);
+    }
+
+    .message {
+      font-size: 1.1rem;
+      margin-top: 20px;
+      min-height: 4em;
+      white-space: pre-line;
+    }
+
+    .counter {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Cramps Detected</h2>
+    <p>Tap the cat for emotional assistance.</p>
+
+    <div class="cat" id="cat" onclick="tapCat()">😾</div>
+
+    <div class="message" id="message">
+      Hi Jiya. This cat is here for moral support.
+    </div>
+
+    <div class="counter" id="counter">0 / 20 taps</div>
+  </div>
+
+<script>
+  let taps = 0;
+
+  // Cat expressions change every tap
+  const catFaces = ["😾", "🙀", "😿", "😼", "😺", "😽", "😻"];
+
+  // Messages shown ONCE, in order
+  const messages = [
+    "Cramps detected. This is extremely rude behaviour.",
+    "This cat has reviewed the situation and is unimpressed.",
+    "You are being inconvenienced, but you are still elite.",
+    "If complaining burned calories, this would be productive.",
+    "You’re handling this better than most people would admit.",
+    "This cat would cancel your responsibilities if it could.",
+    "Your uterus is doing too much. You are not.",
+    "Imagine I just handed you Belgian chocolate milk waffles.",
+    "This tap did nothing medically. Spiritually, it helped.",
+    "You’re still a gitti. A strong gitti. But definitely gitti.",
+    "If pain paid rent, this would at least be useful.",
+    "This cat says rest is mandatory, not optional.",
+    "unrelated but that waist hmmmmmmmm",
+    "I would trade places with you if that were possible.",
+    "This is unfair, but unfortunately temporary.",
+    "You’re still my favourite person, even while suffering.",
+    "Why did the cat sit on the keyboard? Because it wanted to keep an eye on the mouse.(ASKAKSKSAK)",
+    "Almost there. You’re doing really well, even if it doesn’t feel like it.",
+    "Last few taps. Consider this emotional damage control."
+  ];
+
+  function tapCat() {
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+
+    // Change cat expression
+    const cat = document.getElementById("cat");
+    cat.innerText = catFaces[taps % catFaces.length];
+
+    if (taps < messages.length) {
+      document.getElementById("message").innerText = messages[taps];
+      taps++;
+      document.getElementById("counter").innerText = taps + " / 20 taps";
+    } else {
+      document.getElementById("message").innerText =
+        "Okay, Jiya.\n" +
+        "You did enough.\n" +
+        "I know this hurts and I hate that I can’t fix it.\n" +
+        "But I’m here, I care deeply about you, and you never have to deal with this alone.\n" +
+        "I love you and I’ve got you. 💚";
+
+      document.getElementById("counter").innerText = "Support mode: MAX";
+
+      // Show baby visual at the end
+      cat.innerHTML = "👼";
+      cat.style.fontSize = "100px";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,125 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jiya Support System™</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jiya's Mood Rescue 🎮💖</title>
+<style>
+body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    text-align:center;
+    overflow:hidden;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #ffe0f0, #fff7fb);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-    }
+h1{margin-top:40px;}
 
-    .container {
-      padding: 20px;
-      max-width: 340px;
-    }
+button{
+    padding:12px 20px;
+    margin:10px;
+    border:none;
+    border-radius:20px;
+    font-size:16px;
+    background:white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition:0.2s;
+}
+button:active{transform:scale(0.95);}
 
-    .cat {
-      font-size: 90px;
-      margin: 30px auto;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
+.level{display:none;padding:20px;}
 
-    .cat:active {
-      transform: scale(0.9);
-    }
+#cats span{
+    position:absolute;
+    font-size:30px;
+    cursor:pointer;
+    animation: floatUp 4s linear forwards;
+}
 
-    .message {
-      font-size: 1.1rem;
-      margin-top: 20px;
-      min-height: 4em;
-      white-space: pre-line;
-    }
+@keyframes floatUp{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-20vh);}
+}
 
-    .counter {
-      font-size: 0.9rem;
-      opacity: 0.6;
-      margin-top: 10px;
-    }
-  </style>
+.block{
+    display:inline-block;
+    padding:15px;
+    margin:10px;
+    background:white;
+    border-radius:15px;
+    cursor:pointer;
+}
+
+#meter{
+    width:80%;
+    height:20px;
+    background:#fff;
+    margin:20px auto;
+    border-radius:20px;
+    overflow:hidden;
+}
+#fill{
+    width:0%;
+    height:100%;
+    background:#ff99cc;
+}
+
+.reward{
+    font-size:40px;
+    animation:pop 0.5s ease;
+}
+@keyframes pop{
+    from{transform:scale(0);}
+    to{transform:scale(1);}
+}
+</style>
 </head>
-
 <body>
 
-  <div class="container">
-    <h2>Cramps Detected</h2>
-    <p>Tap the cat for emotional assistance.</p>
+<h1>🌸 Jiya’s Mood Rescue Mission 🌸</h1>
+<p>Restore balance to the universe (and maybe Prax’s life).</p>
+<button onclick="startGame()">Start Mission 💖</button>
 
-    <div class="cat" id="cat" onclick="tapCat()">😾</div>
+<div id="level1" class="level">
+    <h2>Level 1: Catch 8 Cats 🐱</h2>
+    <div id="cats"></div>
+    <p>Caught: <span id="score">0</span>/8</p>
+</div>
 
-    <div class="message" id="message">
-      Hi Jiya. This cat is here for moral support.
-    </div>
+<div id="level2" class="level">
+    <h2>Level 2: Build Lego Mood Tower 🧱</h2>
+    <p>Tap blocks in order: 1 → 2 → 3</p>
+    <div id="blocks"></div>
+</div>
 
-    <div class="counter" id="counter">0 / 20 taps</div>
-  </div>
+<div id="level3" class="level">
+    <h2>Level 3: Baby Chaos 👶</h2>
+    <button onclick="babyChoice()">CEO Junior 👔</button>
+    <button onclick="babyChoice()">Mini Jiya 💅</button>
+    <button onclick="babyChoice()">Tiny Girl Boss 🍼</button>
+</div>
+
+<div id="level4" class="level">
+    <h2>Level 4: Restore Girl Boss Power 💼</h2>
+    <p>Tap to charge power.</p>
+    <div id="meter"><div id="fill"></div></div>
+    <button onclick="charge()">Charge ⚡</button>
+</div>
+
+<div id="final" class="level">
+    <h2>Mission Complete 🎉</h2>
+    <p>
+    Okay… maybe I annoyed you a little.  
+    But statistically speaking… you’re still my favorite human in every universe.  
+    Prax survival rate has increased by 73%.  
+    </p>
+    <button onclick="forgive()">Forgive Prax? 😇</button>
+    <div id="result"></div>
+</div>
 
 <script>
-  let taps = 0;
 
-  // Cat expressions change every tap
-  const catFaces = ["😾", "🙀", "😿", "😼", "😺", "😽", "😻"];
+function hideAll(){
+    document.querySelectorAll('.level').forEach(l=>l.style.display='none');
+}
 
-  // Messages shown ONCE, in order
-  const messages = [
-    "Cramps detected. This is extremely rude behaviour.",
-    "This cat has reviewed the situation and is unimpressed.",
-    "You are being inconvenienced, but you are still elite.",
-    "If complaining burned calories, this would be productive.",
-    "You’re handling this better than most people would admit.",
-    "This cat would cancel your responsibilities if it could.",
-    "Your uterus is doing too much. You are not.",
-    "Imagine I just handed you Belgian chocolate milk waffles.",
-    "This tap did nothing medically. Spiritually, it helped.",
-    "You’re still a gitti. A strong gitti. But definitely gitti.",
-    "If pain paid rent, this would at least be useful.",
-    "This cat says rest is mandatory, not optional.",
-    "unrelated but that waist hmmmmmmmm",
-    "I would trade places with you if that were possible.",
-    "This is unfair, but unfortunately temporary.",
-    "You’re still my favourite person, even while suffering.",
-    "Why did the cat sit on the keyboard? Because it wanted to keep an eye on the mouse.(ASKAKSKSAK)",
-    "Almost there. You’re doing really well, even if it doesn’t feel like it.",
-    "Last few taps. Consider this emotional damage control."
-  ];
+function startGame(){
+    hideAll();
+    document.getElementById("level1").style.display="block";
+    spawnCats();
+}
 
-  function tapCat() {
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
+let score=0;
+function spawnCats(){
+    let catArea=document.getElementById("cats");
+    let interval=setInterval(()=>{
+        let cat=document.createElement("span");
+        cat.innerHTML="🐱";
+        cat.style.left=Math.random()*90+"vw";
+        cat.onclick=function(){
+            score++;
+            document.getElementById("score").innerText=score;
+            cat.remove();
+            if(score>=8){
+                clearInterval(interval);
+                setTimeout(()=>{level2();},500);
+            }
+        };
+        catArea.appendChild(cat);
+        setTimeout(()=>cat.remove(),4000);
+    },800);
+}
+
+function level2(){
+    hideAll();
+    document.getElementById("level2").style.display="block";
+    let blocks=document.getElementById("blocks");
+    blocks.innerHTML="";
+    let order=[1,2,3].sort(()=>Math.random()-0.5);
+    let current=1;
+    order.forEach(num=>{
+        let b=document.createElement("div");
+        b.className="block";
+        b.innerText=num;
+        b.onclick=function(){
+            if(num===current){
+                b.style.background="#d4ffd4";
+                current++;
+                if(current===4){
+                    setTimeout(()=>{level3();},500);
+                }
+            } else {
+                b.style.background="#ffd6d6";
+            }
+        };
+        blocks.appendChild(b);
+    });
+}
+
+function level3(){
+    hideAll();
+    document.getElementById("level3").style.display="block";
+}
+
+function babyChoice(){
+    alert("Decision accepted. Prax will follow CEO orders.");
+    level4();
+}
+
+let power=0;
+function charge(){
+    power+=10;
+    document.getElementById("fill").style.width=power+"%";
+    if(power>=100){
+        setTimeout(()=>{finalLevel();},500);
     }
+}
 
-    // Change cat expression
-    const cat = document.getElementById("cat");
-    cat.innerText = catFaces[taps % catFaces.length];
+function level4(){
+    hideAll();
+    document.getElementById("level4").style.display="block";
+}
 
-    if (taps < messages.length) {
-      document.getElementById("message").innerText = messages[taps];
-      taps++;
-      document.getElementById("counter").innerText = taps + " / 20 taps";
-    } else {
-      document.getElementById("message").innerText =
-        "Okay, Jiya.\n" +
-        "You did enough.\n" +
-        "I know this hurts and I hate that I can’t fix it.\n" +
-        "But I’m here, I care deeply about you, and you never have to deal with this alone.\n" +
-        "I love you and I’ve got you. 💚";
+function finalLevel(){
+    hideAll();
+    document.getElementById("final").style.display="block";
+}
 
-      document.getElementById("counter").innerText = "Support mode: MAX";
+function forgive(){
+    document.getElementById("result").innerHTML="<div class='reward'>💖🐱🧱👶💅</div><p>Correct answer detected. Universe stabilized.</p>";
+}
 
-      // Show baby visual at the end
-      cat.innerHTML = "👼";
-      cat.style.fontSize = "100px";
-    }
-  }
 </script>
 
 </body>

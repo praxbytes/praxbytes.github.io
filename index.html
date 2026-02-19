@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jiya's Mood Rescue Mission 🎮</title>
+
+<style>
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    text-align:center;
+    overflow:hidden;
+}
+
+h1{margin-top:50px;}
+
+button{
+    padding:12px 20px;
+    margin:10px;
+    border:none;
+    border-radius:20px;
+    font-size:16px;
+    background:white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition:0.2s;
+}
+button:active{transform:scale(0.95);}
+
+#restartBtn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    font-size:13px;
+    padding:8px 14px;
+}
+
+.level{display:none;padding:20px;}
+
+#cats span{
+    position:absolute;
+    font-size:30px;
+    cursor:pointer;
+    animation: floatUp 4s linear forwards;
+}
+
+@keyframes floatUp{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-20vh);}
+}
+
+.block{
+    display:inline-block;
+    padding:15px;
+    margin:10px;
+    background:white;
+    border-radius:15px;
+    cursor:pointer;
+}
+
+#meter{
+    width:80%;
+    height:20px;
+    background:#fff;
+    margin:20px auto;
+    border-radius:20px;
+    overflow:hidden;
+}
+#fill{
+    width:0%;
+    height:100%;
+    background:#ff99cc;
+    transition:0.3s;
+}
+
+#angerMeter{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    width:150px;
+}
+
+#angerBar{
+    height:12px;
+    background:#ffcccc;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+#angerFill{
+    height:100%;
+    width:80%;
+    background:#ff4d6d;
+    transition:0.3s;
+}
+
+#praxDoll{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    font-size:40px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+#praxDoll:active{
+    transform:scale(2) rotate(-10deg);
+}
+
+.confetti{
+    position:fixed;
+    font-size:20px;
+    animation: fall 2s linear forwards;
+}
+
+@keyframes fall{
+    from{transform:translateY(-10vh);}
+    to{transform:translateY(100vh); opacity:0;}
+}
+
+.levelComplete{
+    font-size:22px;
+    margin-top:10px;
+    animation:pop 0.4s ease;
+}
+
+@keyframes pop{
+    from{transform:scale(0);}
+    to{transform:scale(1);}
+}
+
+.reward{
+    font-size:40px;
+    animation:pop 0.5s ease;
+}
+</style>
+</head>
+
+<body>
+
+<button id="restartBtn" onclick="location.reload()">Restart 🔁</button>
+
+<h1>🌸 Jiya’s Mood Rescue Mission 🌸</h1>
+<p>Restore balance to the universe (and Prax’s safety).</p>
+<button onclick="startGame()">Start Mission 💖</button>
+
+<div id="level1" class="level">
+    <h2>Level 1: Catch 8 🐱</h2>
+    <div id="cats"></div>
+    <p>Caught: <span id="score">0</span>/8</p>
+</div>
+
+<div id="level2" class="level">
+    <h2>Level 2: Build Lego Tower 🧱</h2>
+    <p>Tap blocks in order: 1 → 2 → 3</p>
+    <div id="blocks"></div>
+</div>
+
+<div id="level3" class="level">
+    <h2>Level 3: choose the fate of your 👶</h2>
+    <button onclick="babyChoice()">CEO 8'2 👔</button>
+    <button onclick="babyChoice()">Mini Jiya 💅</button>
+    <button onclick="babyChoice()">kinnuh🍼</button>
+</div>
+
+<div id="level4" class="level">
+    <h2>Level 4: Restore Boss Power 💼</h2>
+    <p>Tap to charge power.</p>
+    <div id="meter"><div id="fill"></div></div>
+    <button onclick="charge()">hitmehard ⚡</button>
+</div>
+
+<div id="final" class="level">
+    <h2>Mission Complete 🎉</h2>
+    <p>
+    Okay… maybe I annoyed you a little.  
+    But even when you’re mad, you’re still my favourite reel opp.  
+    Prax survival probability: significantly improved.  
+    </p>
+    <button onclick="forgive()">Forgive Prax?(PLSSSSS) 😇</button>
+    <div id="result"></div>
+</div>
+
+<!-- Anger Meter -->
+<div id="angerMeter">
+    <p style="margin:0;font-size:13px;">Anger Meter 🔥</p>
+    <div id="angerBar">
+        <div id="angerFill"></div>
+    </div>
+    <p style="font-size:11px;">Tap Prax to reduce anger</p>
+</div>
+
+<!-- Prax Doll -->
+<div id="praxDoll" onclick="hitPrax()">🧍‍♂️</div>
+
+<script>
+
+let score=0;
+let power=0;
+let anger=80;
+
+function hideAll(){
+    document.querySelectorAll('.level').forEach(l=>l.style.display='none');
+}
+
+function startGame(){
+    hideAll();
+    score=0;
+    power=0;
+    document.getElementById("score").innerText=0;
+    document.getElementById("fill").style.width="0%";
+    document.getElementById("level1").style.display="block";
+    spawnCats();
+}
+
+function confettiBurst(){
+    const emojis=["🎉","✨","💖","🐱","🌸","🧱","💅"];
+    for(let i=0;i<20;i++){
+        let c=document.createElement("div");
+        c.className="confetti";
+        c.innerHTML=emojis[Math.floor(Math.random()*emojis.length)];
+        c.style.left=Math.random()*100+"vw";
+        c.style.animationDuration=(Math.random()*2+1)+"s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),2000);
+    }
+}
+
+function showLevelComplete(text){
+    let msg=document.createElement("div");
+    msg.className="levelComplete";
+    msg.innerHTML="Level Complete! "+text;
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),1500);
+}
+
+function spawnCats(){
+    let catArea=document.getElementById("cats");
+    catArea.innerHTML="";
+    let interval=setInterval(()=>{
+        let cat=document.createElement("span");
+        cat.innerHTML="🐱";
+        cat.style.left=Math.random()*90+"vw";
+        cat.onclick=function(){
+            score++;
+            document.getElementById("score").innerText=score;
+            cat.remove();
+            if(score>=8){
+                clearInterval(interval);
+                confettiBurst();
+                showLevelComplete("Cats rescued 🐱");
+                setTimeout(()=>{level2();},1500);
+            }
+        };
+        catArea.appendChild(cat);
+        setTimeout(()=>cat.remove(),4000);
+    },700);
+}
+
+function level2(){
+    hideAll();
+    document.getElementById("level2").style.display="block";
+    let blocks=document.getElementById("blocks");
+    blocks.innerHTML="";
+    let order=[1,2,3].sort(()=>Math.random()-0.5);
+    let current=1;
+    order.forEach(num=>{
+        let b=document.createElement("div");
+        b.className="block";
+        b.innerText=num;
+        b.onclick=function(){
+            if(num===current){
+                b.style.background="#d4ffd4";
+                current++;
+                if(current===4){
+                    confettiBurst();
+                    showLevelComplete("Tower built 🧱");
+                    setTimeout(()=>{level3();},1500);
+                }
+            } else {
+                b.style.background="#ffd6d6";
+            }
+        };
+        blocks.appendChild(b);
+    });
+}
+
+function level3(){
+    hideAll();
+    document.getElementById("level3").style.display="block";
+}
+
+function babyChoice(){
+    confettiBurst();
+    showLevelComplete("jaisi aapki marzi malkin 👶");
+    setTimeout(()=>{level4();},1500);
+}
+
+function level4(){
+    hideAll();
+    document.getElementById("level4").style.display="block";
+}
+
+function charge(){
+    power+=10;
+    document.getElementById("fill").style.width=power+"%";
+    if(power>=100){
+        confettiBurst();
+        showLevelComplete("Girl Boss Power Restored 💼");
+        setTimeout(()=>{finalLevel();},1500);
+    }
+}
+
+function finalLevel(){
+    hideAll();
+    document.getElementById("final").style.display="block";
+}
+
+function forgive(){
+    confettiBurst();
+    document.getElementById("result").innerHTML=
+    "<div class='reward'>💖🐱🧱👶💅✨</div><p>Correct answer detected. Universe stabilized.</p>";
+}
+
+function hitPrax(){
+    anger-=5;
+    if(anger<0) anger=0;
+    document.getElementById("angerFill").style.width=anger+"%";
+}
+
+</script>
+
+</body>
+</html>
